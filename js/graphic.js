@@ -8,7 +8,7 @@ var margin = {
     top: 20,
     right: 30,
     bottom: 50,
-    left: 55
+    left: 65
 };
 
 var data = [
@@ -137,11 +137,12 @@ function render(width) {
         .attr("transform", "translate(0," + height + ")")
         .call(xAxis);
 
-    svg.select(".x.axis")
-        .append("text")
+    // x axis label
+
+    svg.append("text")
         .attr("class", "label")
         .attr("text-anchor", "middle")
-        .attr("transform", "translate(" + width/2 + ", 40)")
+        .attr("transform", "translate(" + width/2 + "," + (height + 40) + ")")
         .text("Fiscal Year");
 
 
@@ -155,7 +156,7 @@ function render(width) {
         .attr("class", "label")
         .style("text-anchor", "end")
         .attr("transform", "rotate(-90)")
-        .attr("y", -40)
+        .attr("y", -55)
         .text("Percent of Population Sample");
 
     //attach grid
@@ -175,7 +176,7 @@ function render(width) {
           .attr("y", function(d){ return y(d.percent);})
           .attr("height", function(d){ return (height - y(d.percent)); })
           .attr("width", x.rangeBand())
-          .attr("opacity", "0.2")
+          .attr("opacity", "0.8")
           .on("mouseover", tip.show)
           .on("mouseout", tip.hide);
 

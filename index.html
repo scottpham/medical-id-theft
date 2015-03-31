@@ -83,7 +83,8 @@
     }  
      
     .axis {
-        font: 10px sans-serif;
+        font: 12px sans-serif;
+        fill: black;
     }
 
     .y.axis path {
@@ -101,7 +102,7 @@
     } 
 
     .y.axis .tick {
-        fill: gray;
+        /*fill: gray;*/
     }
 
     .x.axis line {
@@ -115,9 +116,7 @@
         stroke-width: 0;
     }
 
-    .x.axis text {
-        fill: gray;
-        font: 14px/1.4 Arial, Helvetica, sans-serif;
+    .x.axis .tick {
     }
 
     /*Grid Style*/
@@ -135,8 +134,9 @@
     }
 
     .label {
-        font: 10px sans-serif;
+        font: 12px Arial, Helvetica, sans-serif;
         fill: gray;
+
     }
 
     .bar {
@@ -162,7 +162,7 @@
 
 
     </style>
-<body>
+<body class="container-fluid">
     <h1>Medical Identity Theft</h1>
     <h2>A new study on medical identity theft shows the crime affects more people than ever.</h2>
 
@@ -196,7 +196,7 @@
         </div>
 
         <div class="col-xs-12" id="graphic">
-            <img src="img/graph.png" width="100%" alt="graph from report" />
+            <img src="img/placeholder.png" width="100%" alt="bar graph" />
         </div>
 
     </div>
