@@ -1,34 +1,35 @@
 var mobileThreshold = 300, //set to 500 for testing
     aspect_width = 16,
+    tickNumber = 5,
     aspect_height = 9;
 
 //standard margins
 var margin = {
     top: 20,
-    right: 20,
-    bottom: 20,
-    left: 20
+    right: 30,
+    bottom: 50,
+    left: 55
 };
 
 var data = [
     {
-        "year": "FY 2010",
+        "year": "2010",
         "percent": 0.0053
     },
     {
-        "year": "FY 2011",
+        "year": "2011",
         "percent": 0.0055
     },
     {
-        "year": "FY 2012"
+        "year": "2012",
         "percent": 0.0068
     },
     {
-        "year": "FY 2013",
+        "year": "2013",
         "percent": 0.0082
     },
     {
-        "year": "FY 2014",
+        "year": "2014",
         "percent": 0.012
     }
 ];
@@ -77,22 +78,25 @@ function render(width) {
     //calculate height against container width
     var height = Math.ceil((width * aspect_height) / aspect_width) - margin.top - margin.bottom;
 
+    var width = width - margin.left - margin.right;
 
-    var x = d3.scale.linear().range([0, width]),
-        y = d3.scale.ordinal().rangeRoundBands([0, height], 0.15);
+    console.log(width);
 
-    var format = d3.format("0.2f"); //formats to two decimal places
+
+    var x = d3.scale.ordinal().rangeRoundBands([0, width], 0.2),
+        y = d3.scale.linear().range([height, 0]);
+
+    var format = d3.format("0.2%"); //formats to two decimal places
 
     var xAxis = d3.svg.axis()
         .scale(x)
-        .ticks(tickNumber)
-        .tickFormat()
-        .orient("top")
         .tickSize(5, 0, 0);
 
     var yAxis = d3.svg.axis()
         .scale(y)
+        .ticks(tickNumber)
         .orient("left")
+        .tickFormat(d3.format("0.1%"))
         .tickSize(5, 0, 0);
 
     //create main svg container
@@ -103,38 +107,79 @@ function render(width) {
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
     //tooltip
-    var div = d3.select("#graphic").append("div")
-        .attr("class", "tooltip")
-        .style("opacity", 0);
+    var tip = d3.tip().attr("class", "d3-tip")
+        .html(function(d){ return format(d.percent); });
 
-    //gridlines (call this later)
-    var make_x_axis = function() { 
+    svg.call(tip);
+
+    // raise up tip by 10px
+    tip.offset([-10, 0])
+
+    //define gridlines
+    var make_y_axis = function() { 
         return d3.svg.axis()
-            .scale(x)
-                .orient("bottom")
+            .scale(y)
+                .orient("right")
                 .ticks(tickNumber)
             }
 
-    //asynchronous csv call
-    d3.csv("DATAFILE.CSV", type, function(error, data) {
+    // ATTACH THINGS//////
 
-        //BUILD GRID
-        svg.append("g")
-            .attr("class", "grid")
-            .attr("transform", "translate(0," + height + ")")
-            .call(make_x_axis()
-                .tickSize((-height - 10), 0, 0) //grid lines are actually ticks
-                .tickFormat("")
-            )
-    
-    //end of csv call function
-    });
+    // Set domain and range
+    // x domain is years
+    x.domain(data.map(function(d){ return d.year; }));
+    // y domain is percentage value
+    y.domain([0, d3.max(data, function(d){ return d.percent; })]);
 
-    //coercion function called back during csv call
-    function type(d){
-        d.value = +d.value;
-        return d;
-    }
+    //attach x axis
+    svg.append("g")
+        .attr("class", "x axis")
+        .attr("transform", "translate(0," + height + ")")
+        .call(xAxis);
+
+    svg.select(".x.axis")
+        .append("text")
+        .attr("class", "label")
+        .attr("text-anchor", "middle")
+        .attr("transform", "translate(" + width/2 + ", 40)")
+        .text("Fiscal Year");
+
+
+    //attach y axis
+    svg.append("g")
+        .attr("class", "y axis")
+        .call(yAxis);
+
+    // Attach y axis label directly to svg
+    svg.append("text")
+        .attr("class", "label")
+        .style("text-anchor", "end")
+        .attr("transform", "rotate(-90)")
+        .attr("y", -40)
+        .text("Percent of Population Sample");
+
+    //attach grid
+    svg.append("g")
+        .attr("class", "grid")
+        .call(make_y_axis()
+            // tickSize(inner, outer)
+            .tickSize((width - 10), 0) //grid lines are actually ticks
+            .tickFormat("")
+        );
+
+    svg.selectAll(".bars")
+          .data(data)
+        .enter().append("rect")
+          .attr("class", "bar")
+          .attr("x", function(d){ return x(d.year); })
+          .attr("y", function(d){ return y(d.percent);})
+          .attr("height", function(d){ return (height - y(d.percent)); })
+          .attr("width", x.rangeBand())
+          .attr("opacity", "0.2")
+          .on("mouseover", tip.show)
+          .on("mouseout", tip.hide);
+
+
 
 }//end function render    
 
