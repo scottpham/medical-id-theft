@@ -157,7 +157,7 @@ function render(width) {
         .style("text-anchor", "end")
         .attr("transform", "rotate(-90)")
         .attr("y", -55)
-        .text("Percent of Population Sample");
+        .text("Percent of Sample");
 
     //attach grid
     svg.append("g")
